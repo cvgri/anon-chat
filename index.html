@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sohbet Odası</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #chat {
+      width: 500px;
+      height: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    #message {
+      width: 100%;
+      height: 30px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sohbet Odası</h1>
+  <div id="chat"></div>
+  <input id="message" type="text" placeholder="Mesajınızı girin...">
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // Anonim kullanıcı adı al
+    socket.on('anonimName', (name) => {
+      console.log(`Anonim kullanıcı adı: ${name}`);
+    });
+
+    // Sohbet odasına mesaj gönder
+    document.getElementById('message').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const message = document.getElementById('message').value;
+        socket.emit('message', message);
+        document.getElementById('message').value = '';
+      }
+    });
+
+    // Sohbet odasına mesajları göster
+    socket.on('message', (data) => {
+      const chat = document.getElementById('chat');
+      const message = document.createElement('div');
+      message.textContent = `${data.name}: ${data.message}`;
+      chat.appendChild(message);
+      chat.scrollTop = chat.scrollHeight;
+    });
+  </script>
+</body>
+</html>
